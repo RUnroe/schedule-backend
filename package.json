@@ -1,0 +1,31 @@
+{
+  "name": "waffle-backend",
+  "version": "0.0.0",
+  "description": "API server for the Waffle! schedule tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RUnroe/schedule-backend.git"
+  },
+  "author": "Joe Reed",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/RUnroe/schedule-backend/issues"
+  },
+  "homepage": "https://github.com/RUnroe/schedule-backend#readme",
+  "dependencies": {
+    "argon2": "^0.27.2",
+    "body-parser": "^1.19.0",
+    "cassandra-store": "^5.0.0",
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "http-proxy-middleware": "^2.0.0",
+    "logger": "github:josephreed2600/logger",
+    "multer": "^1.4.2",
+    "snowflake-generator": "^0.0.3"
+  }
+}
