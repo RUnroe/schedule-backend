@@ -26,7 +26,8 @@ logger.info('Instantiated globals.');
 
 logger.info("Configuring microservices...");
 let routeFiles = [
-	  //'api/v0/friends'
+	  'api/v0/friends'
+	, 'api/v0/calendars'
 ];
 const micros = require('./microservices');
 // whitelist routes
@@ -82,7 +83,7 @@ logger.info('Configuring routes...');
 const routeManager = require('./routes/manager');
 routeFiles.forEach((file) => {
 	logger.info(`Adding ${file} routes...`);
-	let component = require(`./routes/${file}`);
+	const component = require(`./routes/${file}`);
 	if(component.configure) component.configure({
 		// pass stuff to routing files here
 		// dependency injection :tm:

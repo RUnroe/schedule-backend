@@ -5,8 +5,8 @@ const apply = (app, component) => {
 		if (route.handlers.constructor.name !== 'Array') route.handlers = [route.handlers];
 		route.methods.forEach((method) => {
 			route.uris.forEach((uri) => {
-				app[method](route.uri, ...route.handlers);
-				if(component.logger) component.logger.info(`Adding route: ${method.toLocaleUpperCase()} ${route.uri}`);
+				app[method](uri, ...route.handlers);
+				if(component.logger) component.logger.info(`Adding route: ${method.toLocaleUpperCase()} ${uri}`);
 			});
 		});
 	});
