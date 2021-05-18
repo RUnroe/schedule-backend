@@ -9,6 +9,7 @@ const logger = require("logger").get("main");
 
 logger.info('Requiring packages...');
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const upload = require('multer')({ dest: __dirname + '/public/icons' });
@@ -47,8 +48,7 @@ logger.info("Configured microservices.");
 
 logger.info("Configuring Express...");
 app.set("trust proxy", 1);
-app.set("view engine", "pug");
-app.set("views", __dirname + "/views");
+app.use(cors());
 app.use(express.static(path.join(__dirname + "/public")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
