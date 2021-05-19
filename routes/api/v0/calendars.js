@@ -61,11 +61,43 @@ const calendars = (req, res) => {
 	);
 };
 
+const details = (req, res) => {
+	res.json(
+		{
+			"181783920193021334": {
+				"name": "get outlook for toster"
+				, "url": "https://eeee.outlook.com/ur-mom.ics"
+				, "enabled": true
+			}
+			, "181783920193021336": {
+				"name": "gogle"
+				, "url": "https://gmail.google.com/zoinks.ics"
+				, "enabled": false
+			}
+			, "181783920193021337": {
+				"name": "YAHOOOOOOOO"
+				, "url": "https://yahoo.mx/adsadfal.ics"
+				, "enabled": true
+			}
+			, "181783920193021338": {
+				"name": "wait are you guys outside"
+				, "url": "https://cody.ashby/no/sorry.ics"
+				, "enabled": true
+			}
+		}
+	);
+};
+
 const routes = [
 	{
 		uris: `/api/${ver}/${branch}`
 		, methods: 'get'
 		, handlers: calendars
+	}
+	, {
+		uris: `/api/${ver}/${branch}/details`
+		, methods: 'get'
+		, handlers: details
 	}
 ];
 
