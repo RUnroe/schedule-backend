@@ -21,7 +21,6 @@ const snowmachine = new (require('snowflake-generator'))(1420070400000);
 logger.info('Instantiated globals.');
 
 logger.info("Configuring Express...");
-app.set("trust proxy", 1);
 app.use(cors());
 app.use(express.static(path.join(__dirname + "/public")));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -58,6 +57,7 @@ logger.info('Configuring routes...');
 const routeFiles = [
 	  'api/v0/friends'
 	, 'api/v0/calendars'
+	, 'api/v0/auth'
 ];
 const routeManager = require('./routes/manager');
 routeFiles.forEach((file) => {
