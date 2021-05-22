@@ -26,7 +26,8 @@ app.use(cors());
 app.use(express.static(path.join(__dirname + "/public")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(session());
+app.use(require('cookie-parser')(require('./secrets').session.secret));
+app.use(session);
 logger.info("Configured Express.");
 
 //logger.info("Configuring sessions...");
