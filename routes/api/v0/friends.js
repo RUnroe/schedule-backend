@@ -6,10 +6,10 @@ const snowmachine = new (require('snowflake-generator'))(1420070400000);
 
 const search = (req, res) => {
 	res.json([
-		{ "id": "18162393822390029", "name": "Joe Mama" , "icon": "18162838739488302" }
-		, { "id": "18162393822390030", "name": "Joe Manga", "icon": "18162833478388302" }
-		, { "id": "18162393822390031", "name": "Banjoe Ma", "icon": "18162833434328302" }
-		, { "id": "18162393822390032", "name": "fu Ma", "icon": "18162833434328302" }
+		{ "id": "18162393822390029", "name": "Joe Mama" , "icon": "18162838739488302", "pending": false }
+		, { "id": "18162393822390030", "name": "Joe Manga", "icon": "18162833478388302", "pending": false }
+		, { "id": "18162393822390031", "name": "Banjoe Ma", "icon": "18162833434328302", "pending": true }
+		, { "id": "18162393822390032", "name": "fu Ma", "icon": "18162833434328302", "pending": false }
 	]);
 };
 
