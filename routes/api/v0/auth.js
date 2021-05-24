@@ -1,4 +1,3 @@
-console.log(process.env);
 const { ver } = require('./config');
 const branch = 'auth';
 const logger = require('logger').get(`api::${ver}::${branch}`);
