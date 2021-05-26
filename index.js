@@ -16,8 +16,9 @@ logger.info('Required packages.');
 
 logger.info('Instantiating globals...');
 const app = express();
-const { session } = require('./db/init');
-const snowmachine = new (require('snowflake-generator'))(1420070400000);
+const { db, session } = require('./db/init');
+const snowmachine = new (require('snowflake-generator'))(process.env.EPOCH);
+const dal = require('./db/dal')({db, snowmachine});
 logger.info('Instantiated globals.');
 
 logger.info("Configuring Express...");

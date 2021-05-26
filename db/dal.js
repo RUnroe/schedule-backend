@@ -1,29 +1,17 @@
 const logger = require('logger').get('dal');
-const db = require('./db-connect');
+
+let db, snowmachine;
+const configure = (obj) => {
+	db = obj['db'];
+	snowmachine = obj['snowmachine'];
+};
+
 const Long = require('long');
-// TODO move these to config file or something
-// epoch comes from https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right
-const epoch = 1420070400000; // ms between 1970 and 2015
-// bucket size represents ten days, per https://blog.discord.com/how-discord-stores-billions-of-messages-7fa6ec7ee4c7
-const bucket_size = 1000 * 60 * 60 * 24 * 10; // ms per ten days
-const snowmachine = new (require('snowflake-generator'))(epoch);
-// represents the Discord Epoch, in 2015 or something
-const discriminator_cap = 10000; // permit #0000 to #9999
 
 const hasher = require('argon2');
 const hash_options = {
 	type: hasher.argon2id
 };
-
-const getBucket = (timestamp, errors = []) => {
-	timestamp = coerceToLong(timestamp, errors);
-	return Math.round((timestamp.shiftRightUnsigned(22) - 0 + epoch) / bucket_size);
-};
-
-// cassandra-driver:
-// https://docs.datastax.com/en/developer/nodejs-driver/4.6/api/class.Client/
-
-const Schema = require('./Schema');
 
 // takes data from database and converts anything necessary before shipping data to users
 // e.g. convert snowflakes from Long to string
@@ -39,84 +27,14 @@ const convertTypesForDistribution = (row) => {
 	return out;
 };
 
+// TODO implement password validation
+			//(record, isUpdate) => {return ((isUpdate && record.name === undefined) || (/^[a-z0-9-]{1,64}$/.test(record.name) && /^[a-z0-9]/.test(record.name) && /[a-z0-9]$/.test(record.name) && !(/--/.test(record.name))))? [] : [`Channel name must be composed only of lowercase a-z and hyphens, with no more than one consecutive hyphen, starting and ending with a letter, but ${record.name} was supplied`]}
 // oh no, what have i done
 // name, keys, requireds, nullables, immutables, automatics, update keys, type samples, validators, permit nulls
 const schemas = {
-	guilds: new Schema('guilds'
-		, ['guild_id', 'name', 'icon_id'] // keys
-		, ['guild_id'] // requireds
-		, [] // nullables
-		, ['guild_id'] // immutables
-		, ['guild_id'] // automatics
-		, ['guild_id'] // update keys
-		, { // type samples
-			'guild_id': new Long()
-			, 'name': ''
-			, 'icon_id': new Long()
-		})
-	, channels_by_guild: new Schema('channels_by_guild'
-		, ['guild_id', 'position', 'channel_id', 'name'] // keys
-		, ['guild_id', 'channel_id'] // requireds // i just added channel_id, that might be wrong
-		, [] // nullables
-		, ['guild_id', 'channel_id'] // immutables
-		, ['channel_id'] // automatics
-		, ['guild_id', 'channel_id'] // update keys
-		, { // type samples
-			'guild_id': new Long()
-			, 'position': 0
-			, 'channel_id': new Long()
-			, 'name': ''
-		}
-		, [ // validators
-			(record, isUpdate) => {return ((isUpdate && record.name === undefined) || (/^[a-z0-9-]{1,64}$/.test(record.name) && /^[a-z0-9]/.test(record.name) && /[a-z0-9]$/.test(record.name) && !(/--/.test(record.name))))? [] : [`Channel name must be composed only of lowercase a-z and hyphens, with no more than one consecutive hyphen, starting and ending with a letter, but ${record.name} was supplied`]}
-		])
-	, messages_by_channel_bucket: new Schema('messages_by_channel_bucket'
-		, ['channel_id', 'bucket', 'message_id', 'author_id', 'body'] // keys
-		, ['channel_id', 'bucket', 'message_id'] // requireds
-		, [] // nullables
-		, ['channel_id', 'bucket', 'message_id', 'author_id'] // immutables
-		, ['channel_id', 'bucket', 'message_id'] // automatics
-		, ['channel_id', 'bucket', 'message_id'] // update keys
-		, { // type samples
-			'channel_id': new Long()
-			, 'bucket': 0
-			, 'message_id': new Long()
-			, 'author_id': new Long()
-			, 'body': ''
-		}
-		, [ // validators
-		])
-	, users: new Schema('users'
-		, ['user_id', 'name', 'discriminator', 'password', 'email', 'icon_id'] // keys
-		, ['user_id'] // requireds
-		, [] // nullables
-		, ['user_id', 'email'] // immutables
-		, ['user_id', 'discriminator'] // automatics
-		, ['user_id'] // update keys
-		, { // type samples
-			'user_id': new Long()
-			, 'name': ''
-			, 'discriminator': 0
-			, 'password': ''
-			, 'email': ''
-			, 'icon_id': new Long()
-		}
-		, [ // validators
-		])
-	, icons: new Schema('icons'
-		, ['icon_id', 'url'] // keys
-		, ['icon_id'] // requireds
-		, [] // nullables
-		, ['icon_id', 'url'] // immutables
-		, ['icon_id'] // automatics
-		, [] // update keys
-		, { // type samples
-			'icon_id': new Long()
-			, 'url': ''
-		}
-		, [ // validators
-			(obj, isUpdate) => { return isUpdate ? ['An attempt was made to update an icon, but this operation is not permitted'] : []; }
-		])
+	User: require('./schemas/User')
+	, Calendar: require('./schemas/Calendar')
+	, Friendship: require('./schemas/Friendship')
 };
 
 // adds things like 'guild_id < ?' to the list of constraints supplied
@@ -208,6 +126,7 @@ const coerceToLong = (x, errors = []) => { // error list may be omitted; if it d
 /*************************************************************************
  * guilds
  */
+/*
 // returns description of guild, or throws
 const createGuild = async (name, icon_snowflake) => {
 	const errors = [];
@@ -309,10 +228,12 @@ const deleteGuild = async (guild_snowflake) => {
 		guild_id: guild_snowflake
 	})).then(() => {});
 };
+*/
 
 /*************************************************************************
  * channels_by_guild
  */
+/*
 // returns description of channel, or throws
 const createChannel = async (guild_snowflake, name, position = -1) => {
 	const errors = [];
@@ -477,11 +398,13 @@ const clearChannels = async (guild_snowflake) => {
 
 	return db.execute('DELETE FROM channels_by_guild WHERE guild_id = ?', [guild_snowflake], { prepare: true }).then(() => {});
 };
+*/
 
 
 /*************************************************************************
  * messages_by_channel
  */
+/*
 // returns description of message, or throws
 const createMessage = async (channel_snowflake, author_snowflake, body) => {
 	const errors = [];
@@ -518,6 +441,7 @@ const createMessage = async (channel_snowflake, author_snowflake, body) => {
 // FIXME FIXME FIXME ohno ^
 // you might need to grab the whole bucket and filter over here
 // FIXME unrelated, if they give us a message_id, just search the bucket it belongs in! brilliant!
+// i wonder if i ever fixed that
 const getMessages = async (channel_snowflake, options = {
 	before: undefined
 	, after: undefined
@@ -619,15 +543,15 @@ const getMessages = async (channel_snowflake, options = {
 	// - all of the above items
 	// - our before and after times are defined and reasonable
 	// next let's add them to our list of constraints
-	/*
+	//
 	// WEATHER UPDATE
 	// We're not doing this on the database anymore, because of Big Hole
 	// instead we're gonna get full buckets and filter server-side
-	constraints.push('message_id <= ?');
-	params.push(latest);
-	constraints.push('message_id >= ?');
-	params.push(earliest);
-	*/
+	//constraints.push('message_id <= ?');
+	//params.push(latest);
+	//constraints.push('message_id >= ?');
+	//params.push(earliest);
+	//
 	// we now certainly know:
 	// - all of the above items
 	// - we will only receive messages from within the time boundaries
@@ -758,10 +682,12 @@ const deleteMessage = async (channel_snowflake, message_snowflake) => {
 		, message_id: message_snowflake
 	})).then(() => {});
 };
+*/
 
 /*************************************************************************
  * users
  */
+/*
 // returns description of user, or throws
 const createUser = async (name, email, password, icon_snowflake) => {
 	const errors = [];
@@ -905,10 +831,12 @@ const authenticate = async (email, password) => {
 		.catch(() => null);
 		//.catch((e) => {console.log(e); return null;});
 };
+*/
 
 /*************************************************************************
  * icons
  */
+/*
 // returns description of user, or throws
 const createIcon = async (url) => {
 	const errors = [];
@@ -943,19 +871,34 @@ const getIcon  = async (icon_id) => {
 		.catch(e => null);
 	;
 };
+*/
+		
+const createUser = async () => {throw ['Unimplemented'];};
+const getUser = async () => {throw ['Unimplemented'];};
+const updateUser = async () => {throw ['Unimplemented'];};
+const authenticate = async () => {throw ['Unimplemented'];};
+const searchUsers = async () => {throw ['Unimplemented'];};
 
-// TODO add userExists, guildExists, etc.
-// returns list of user descriptions, or throws
-const iconExists = async (icon_id) => {
+const getCalendarsByUser = async () => {throw ['Unimplemented'];};
+const getCalendarDetails = async () => {throw ['Unimplemented'];};
+const getCalendarEventsByCalendar = async () => {throw ['Unimplemented'];};
+const updateCalendars = async () => {throw ['Unimplemented'];};
+
+const createFriendship = async () => {throw ['Unimplemented'];};
+const acceptFriendship = async () => {throw ['Unimplemented'];};
+const declineFriendship = async () => {throw ['Unimplemented'];};
+const endFriendship = async () => {throw ['Unimplemented'];};
+
+const getCalendarEventsByUser = async (user_id) => {
 	const errors = [];
-	icon_id = coerceToLong(icon_id, errors);
+	user_id = coerceToLong(user_id, errors);
 
 	if (errors.length) {
 		throw errors;
 	}
 
-	return db.execute('SELECT * FROM icons WHERE icon_id = ?', [icon_id], { prepare: true })
-		.then(res => res.rows.length > 0)
+	return db.execute('SELECT url FROM calendars WHERE user_id = ?', [user_id], { prepare: true })
+		.then(res => res.rows)
 	;
 };
 
@@ -968,11 +911,17 @@ const executeBatch = async (stmts) => {
 	return db.batch(stmts, { prepare: true });
 };
 
-module.exports = {
-	Schema, schemas, executeRaw, executeBatch, db
-	, createGuild, getGuilds, updateGuild, deleteGuild
-	, createChannel, getChannels, updateChannel, deleteChannel, clearChannels, addChannelToGuild // FIXME that last one doesn't work yet
-	, createMessage, getMessages, updateMessage, deleteMessage
-	, createUser, getUsers, updateUser, deleteUser, authenticate
-	, createIcon, getIcon, iconExists
+module.exports = ({db, snowmachine}) => {
+	configure({db});
+	return {
+		schemas, executeRaw, executeBatch, db
+		, createUser, getUser, updateUser, authenticate, searchUsers
+		, getCalendarsByUser, getCalendarDetails, getCalendarEventsByCalendar, getCalendarEventsByUser, updateCalendars
+		, createFriendship, acceptFriendship, declineFriendship, endFriendship
+	//, createGuild, getGuilds, updateGuild, deleteGuild
+	//, createChannel, getChannels, updateChannel, deleteChannel, clearChannels, addChannelToGuild // FIXME that last one doesn't work yet
+	//, createMessage, getMessages, updateMessage, deleteMessage
+	//, createUser, getUsers, updateUser, deleteUser, authenticate
+	//, createIcon, getIcon, iconExists
 };
+}
