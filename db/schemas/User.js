@@ -1,3 +1,4 @@
+const Long = require('long');
 const Schema = require('./Schema');
 
 module.exports = new Schema(
@@ -5,7 +6,7 @@ module.exports = new Schema(
 	, ['id', 'first_name', 'last_name', 'password', 'email'] // keys
 	, ['id'] // requireds
 	, ['first_name', 'last_name'] // nullables
-	, ['id', 'email'] // immutables
+	, ['id', 'email', 'password'] // immutables
 	, ['id'] // automatics
 	, ['id'] // update keys
 	, { // type samples

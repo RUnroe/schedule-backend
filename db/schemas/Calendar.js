@@ -1,3 +1,4 @@
+const Long = require('long');
 const Schema = require('./Schema');
 
 module.exports = new Schema(

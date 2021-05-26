@@ -90,7 +90,7 @@ const details = (req, res) => {
 
 const routes = [
 	{
-		uris: `/api/${ver}/${branch}`
+		uris: `/api/${ver}/${branch}` // ?user_id=123,456,789
 		, methods: 'get'
 		, handlers: calendars
 	}
