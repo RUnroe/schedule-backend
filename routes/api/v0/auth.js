@@ -35,11 +35,27 @@ const doesntHasAauth = (req, res) => {
 	res.end('You do not haas a session')
 }
 
+const getUserInfo = (q,s) => {
+	s.json(
+		{
+  "user_id": "18162393822390028"
+, "email": "josephreed2600@gmail.com"
+, "first_name": "Joe"
+, "last_name": "Reed"
+}
+	);
+}
+
 const routes = [
 	{
 		uris: `/api/${ver}/${branch}`
-		, methods: ['get', 'post']
+		, methods: ['post']
 		, handlers: authorize
+	}
+	, {
+		uris: `/api/${ver}/${branch}`
+		, methods: ['get']
+		, handlers: getUserInfo
 	}
 	, {
 		uris: `/api/${ver}/${branch}/test`
