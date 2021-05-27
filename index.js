@@ -26,6 +26,14 @@ app.use(cors());
 app.use(express.static(path.join(__dirname + "/public")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+// https://stackoverflow.com/a/15819481/6627273
+app.use((err, req, res, next) => {
+	if (err instanceof SyntaxError) {
+		res.status(400);
+		res.json(['Malformed syntax']);
+		console.log(err);
+	} else next();
+});
 app.use(require('cookie-parser')(require('./secrets').session.secret));
 app.use(session);
 logger.info("Configured Express.");
