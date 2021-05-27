@@ -116,21 +116,17 @@ const gen_id = (errors = []) => coerceToLong(snowmachine.generate().snowflake);
  ** 
  **  - all crud operations are async and may throw an array of strings that describe errors
  **   - as many errors as possible/helpful should be thrown at once
- **   - all methods should start with a type-checking block
  **  - all snowflakes should be acceptable as either strings or Longs
  **  - all snowflakes should be returned as strings
  **  - optional keys or parameters that are undefined should be ignored
  **  - optional keys or parameters with otherwise illegal values (including null) should throw errors
  **  - required keys or parameters with illegal values (including undefined and null) should throw errors
  **
- **  - create takes only mandatory parameters, no options object
- **   - returns the created record
- **  - read takes mandatory parameters and an options object
- **   - returns an array of records
- **  - update takes mandatory parameters and an options object
- **   - returns undefined
- **  - delete takes only mandatory parameters, no options object
- **   - returns undefined
+ **  - all methods should take a single object with consistently-named keys
+ **     e.g., getUserInfo({user_id})
+ **     NOT   getUserInfo( user_id )
+ **     NOT   getUserInfo({id})
+ **     NOT   getUserInfo( id )
  **
  */
 
