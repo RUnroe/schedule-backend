@@ -67,22 +67,22 @@ const editUserInfo = (req, res) => {
 const routes = [
 	{
 		uris: `/api/${ver}/${branch}`
-		, methods: ['get']
+		, methods: 'get'
 		, handlers: [requireAuth(), getUserInfo]
 	}
 	, {
 		uris: `/api/${ver}/${branch}`
-		, methods: ['post']
+		, methods: 'post'
 		, handlers: authenticate
 	}
 	, {
 		uris: `/api/${ver}/${branch}`
-		, methods: ['put']
+		, methods: 'put'
 		, handlers: [requireAuth(), editUserInfo]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/create`
-		, methods: ['post']
+		, methods: 'post'
 		, handlers: createUser
 	}
 	, {
