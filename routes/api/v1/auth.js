@@ -97,16 +97,6 @@ const routes = [
 		, methods: 'post'
 		, handlers: createUser
 	}
-	, {
-		uris: `/api/${ver}/${branch}/test`
-		, methods: ['get', 'post']
-		, handlers: [requireAuth(`/api/${ver}/${branch}/test/failed`), hasAuth]
-	}
-	, {
-		uris: `/api/${ver}/${branch}/test/failed`
-		, methods: ['get', 'post']
-		, handlers: [requireNotAuth(`/api/${ver}/${branch}/test`), doesntHasAauth]
-	}
 ];
 
 module.exports = { logger, routes, configure };
