@@ -180,10 +180,10 @@ const authenticate = async ({email, password}) => {
 	;
 };
 
-const getCalendarsByUser = async () => {throw ['Unimplemented'];};
-const getCalendarDetails = async () => {throw ['Unimplemented'];};
-const getCalendarEventsByCalendar = async () => {throw ['Unimplemented'];};
+		
 const updateCalendars = async () => {throw ['Unimplemented'];};
+const getCalendarDetails = async () => {throw ['Unimplemented'];};
+const getCalendarEventsByUserIds = async () => {throw ['Unimplemented'];};
 
 const searchFriends = async ({user_id, user_name}) => {
 	const query = [];
@@ -225,7 +225,7 @@ module.exports = ({db, snowmachine}) => {
 	return {
 		schemas, executeRaw, executeBatch, db
 		, createUser, getUserById, getUserByEmail, updateUser, authenticate
-		, getCalendarsByUser, getCalendarDetails, getCalendarEventsByCalendar, getCalendarEventsByUser, updateCalendars
+		, updateCalendars, getCalendarDetails, getCalendarEventsByUserIds
 		, searchFriends, createFriendship, acceptFriendship, declineFriendship, endFriendship
 	};
 };
