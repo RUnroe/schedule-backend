@@ -183,9 +183,21 @@ const authenticate = async ({email, password}) => {
 	;
 };
 
-		
-const updateCalendars = async () => {throw ['Unimplemented'];};
-const getCalendarDetails = async () => {throw ['Unimplemented'];};
+// Given a user ID, return all calendar details for that user
+const getCalendarDetails = async ({user_id}) => {
+	const query = schemas.Calendar.getSelectStmt({user_id});
+	logger.debug(JSON.stringify(query));
+	return db.query(...query)
+		.then(res => res.rows.map(convertTypesForDistribution))
+		.then(results => {
+			const out = {};
+			for (let row of results) {
+				out[row.calendar_id] = row;
+				delete out[row.calendar_id].calendar_id;
+			}
+			return out;
+		});
+};
 const getCalendarEventsByUserIds = async () => {throw ['Unimplemented'];};
 
 const searchFriends = async ({user_id, user_name}) => {
