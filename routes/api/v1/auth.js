@@ -64,6 +64,13 @@ const editUserInfo = (req, res) => {
 	.catch(handle(req, res));
 };
 
+const endSession = (req, res) => {
+	req.session.destroy();
+	res.status(204);
+	res.statusMessage = 'Logged out';
+	res.end();
+};
+
 const routes = [
 	{
 		uris: `/api/${ver}/${branch}`
@@ -79,6 +86,11 @@ const routes = [
 		uris: `/api/${ver}/${branch}`
 		, methods: 'put'
 		, handlers: [requireAuth(), editUserInfo]
+	}
+	, {
+		uris: `/api/${ver}/${branch}`
+		, methods: 'delete'
+		, handlers: [requireAuth(), endSession]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/create`
