@@ -136,8 +136,9 @@ module.exports = class Schema {
 		});
 		for (let key of columns) params.push(changes[key]);
 		for (let key of update_keys) params.push(changes[key]);
-		const column_string = columns.map((c, index) => `${c} = $${index+1}`).join(', ');
-		const key_string = update_keys.map((c, index) => `${c} = $${index+1}`).join(' AND ');
+		let index = 0; // need to persist numbering from one string to the next, e.g., UPDATE Users SET first_name = $1 WHERE user_id = $2;
+		const column_string = columns.map(c => `${c} = $${++index}`).join(', ');
+		const key_string = update_keys.map(c => `${c} = $${++index}`).join(' AND ');
 
 		return [
 			`UPDATE ${this.name} SET ${column_string} WHERE ${key_string};`
