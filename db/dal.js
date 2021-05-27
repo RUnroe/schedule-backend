@@ -159,7 +159,11 @@ const getUserByEmail = async ({email}) => {
 	logger.debug(JSON.stringify(query));
 	return db.query(...query).then(res => res.rows.map(convertTypesForDistribution)[0]);
 };
-const updateUser = async () => {throw ['Unimplemented'];};
+const updateUser = async ({user_id, first_name, last_name}) => {
+	const query = schemas.User.getUpdateStmt({user_id, first_name, last_name});
+	logger.debug(JSON.stringify(query));
+	return db.query(...query).then(res => undefined);
+};
 const authenticate = async () => {throw ['Unimplemented'];};
 const searchUsers = async () => {throw ['Unimplemented'];};
 

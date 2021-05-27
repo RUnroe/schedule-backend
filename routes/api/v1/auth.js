@@ -51,18 +51,33 @@ const getUserInfo = (req, res) => {
 	dal.getUserById({user_id: req.session.user_id}).then(user => {
 		res.json(user);
 	}).catch(handle(req, res));
-}
+};
+
+const editUserInfo = (req, res) => {
+	dal.updateUser({user_id: req.session.user_id, first_name: req.body.first_name, last_name: req.body.last_name})
+	.then(() => {
+		res.status(204);
+		res.statusMessage = 'Updated';
+		res.end();
+	})
+	.catch(handle(req, res));
+};
 
 const routes = [
 	{
+		uris: `/api/${ver}/${branch}`
+		, methods: ['get']
+		, handlers: [requireAuth(), getUserInfo]
+	}
+	, {
 		uris: `/api/${ver}/${branch}`
 		, methods: ['post']
 		, handlers: authorize
 	}
 	, {
 		uris: `/api/${ver}/${branch}`
-		, methods: ['get']
-		, handlers: [requireAuth(), getUserInfo]
+		, methods: ['put']
+		, handlers: [requireAuth(), editUserInfo]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/create`
