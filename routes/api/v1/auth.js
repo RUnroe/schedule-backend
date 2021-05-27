@@ -47,15 +47,10 @@ const doesntHasAauth = (req, res) => {
 	res.end('You do not haas a session')
 }
 
-const getUserInfo = (q,s) => {
-	s.json(
-		{
-			"user_id": "18162393822390028"
-			, "email": "josephreed2600@gmail.com"
-			, "first_name": "Joe"
-			, "last_name": "Reed"
-		}
-	);
+const getUserInfo = (req, res) => {
+	dal.getUserById({user_id: req.session.user_id}).then(user => {
+		res.json(user);
+	}).catch(handle(req, res));
 }
 
 const routes = [
@@ -67,7 +62,7 @@ const routes = [
 	, {
 		uris: `/api/${ver}/${branch}`
 		, methods: ['get']
-		, handlers: getUserInfo
+		, handlers: [requireAuth(), getUserInfo]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/create`

@@ -146,7 +146,14 @@ const createUser = async (user) => {
 		})
 	);
 };
-const getUserById = async () => {throw ['Unimplemented'];};
+const getUserById = async ({user_id}) => {
+	const query = schemas.User.getSelectStmt({user_id});
+	logger.debug(JSON.stringify(query));
+	return db.query(...query).then(res => res.rows
+		.map(convertTypesForDistribution)
+		.map(user => { delete user.password; return user; })
+		[0]);
+};
 const getUserByEmail = async ({email}) => {
 	const query = ['SELECT user_id, email, first_name, last_name FROM users WHERE email = $1;', [email]];
 	logger.debug(JSON.stringify(query));
