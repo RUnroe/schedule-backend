@@ -183,6 +183,83 @@ const authenticate = async ({email, password}) => {
 	;
 };
 
+// this one is a complex operation
+// 1. Get a copy of the user's current calendars.
+// 2. Split the work into four categories:
+//    a. No-op: A record in the input matches an existing record exactly.
+//    b. Create: A record in the input has an ID that does not match any existing record.
+//    c. Update: A record in the input has an ID that matches an existing record, but at least one other field differs.
+//    d. Delete: An existing record does not match the ID of any input record.
+const updateCalendars = async ({user_id, calendars}) => {
+	// format: {calendar_id, user_id, name, url, enabled}
+	const _existing = await getCalendarDetails({user_id});
+	const existing = Object.keys(_existing).map(calendar_id => ({
+		calendar_id
+		, user_id
+		, name   : _existing[calendar_id].name
+		, url    : _existing[calendar_id].url
+		, enabled: _existing[calendar_id].enabled
+	}));
+	const input = Object.keys(calendars).map(calendar_id => ({
+		calendar_id
+		, user_id
+		, name   : calendars[calendar_id].name
+		, url    : calendars[calendar_id].url
+		, enabled: calendars[calendar_id].enabled
+	}));
+
+	// For each input, determine whether it is new
+	const newCalendars = [];
+	const overlappingInputCalendars = [];
+	for (let i of input)
+		if (existing.map(c => c.calendar_id).includes(i.calendar_id)) {
+			overlappingInputCalendars.push(i);
+		} else {
+			newCalendars.push(i);
+		}
+	// For each existing, determine whether it is to be deleted
+	const deletedCalendars = [];
+	const overlappingExistingCalendars = [];
+	for (let e of existing)
+		if (input.map(c => c.calendar_id).includes(e.calendar_id)) {
+			overlappingExistingCalendars.push(e);
+		} else {
+			deletedCalendars.push(e);
+		}
+	// For each overlapping calendar, determine whether it has been changed
+	const changedCalendars = [];
+	for (let i of overlappingInputCalendars.map(JSON.stringify))
+		if (overlappingExistingCalendars.map(JSON.stringify).includes(i)) {
+		} else {
+			changedCalendars.push(JSON.parse(i));
+		}
+
+	//console.log('newCalendars', newCalendars);
+	//console.log('deletedCalendars', deletedCalendars);
+	//console.log('overlappingInputCalendars', overlappingInputCalendars);
+	//console.log('overlappingExistingCalendars', overlappingExistingCalendars);
+	//console.log('changedCalendars', changedCalendars);
+
+	// Insert the new calendars
+	for (let cal of newCalendars) {
+		cal.calendar_id = gen_id();
+		const query = schemas.Calendar.getInsertStmt(cal);
+		logger.debug(JSON.stringify(query));
+		await db.query(...query);
+	}
+	// Delete the deleted calendars
+	for (let {calendar_id} of deletedCalendars) {
+		const query = schemas.Calendar.getDeleteStmt({calendar_id});
+		logger.debug(JSON.stringify(query));
+		await db.query(...query);
+	}
+	// Update the changed calendars
+	for (let cal of changedCalendars) {
+		const query = schemas.Calendar.getUpdateStmt(cal);
+		logger.debug(JSON.stringify(query));
+		await db.query(...query);
+	}
+};
 // Given a user ID, return all calendar details for that user
 const getCalendarDetails = async ({user_id}) => {
 	const query = schemas.Calendar.getSelectStmt({user_id});

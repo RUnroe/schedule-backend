@@ -71,6 +71,15 @@ const getCalendarDetails = (req, res) => {
 		.then(details => res.json(details))
 		.catch(handle(req, res));
 };
+
+const editCalendarDetails = (req, res) => {
+	dal.updateCalendars({user_id: req.session.user_id, calendars: req.body})
+		.then(() => {
+			res.status(204);
+			res.statusMessage = 'Updated';
+			res.end();
+		})
+		.catch(handle(req, res));
 };
 
 const routes = [
@@ -84,6 +93,10 @@ const routes = [
 		, methods: 'get'
 		, handlers: [requireAuth(), getCalendarDetails]
 	}
+	, {
+		uris: `/api/${ver}/${branch}/details`
+		, methods: 'put'
+		, handlers: [requireAuth(), editCalendarDetails]
 	}
 ];
 
