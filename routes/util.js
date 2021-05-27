@@ -1,10 +1,14 @@
 const requireAuth = (redirect) => (req, res, next) => {
 	if (req.session.user_id) next();
-	else res.redirect(redirect);
+	else if (redirect) res.redirect(redirect);
+	else res.sendStatus(401);
 };
 
 const requireNotAuth = (redirect) => (req, res, next) => {
-	if (req.session.user_id) res.redirect(redirect);
+	if (req.session.user_id) {
+		if (redirect) res.redirect(redirect);
+		else res.sendStatus(403); // dunno how to say "you're supposed to be not logged in, but you're logged in", so i guess Forbidden works?
+	}
 	else next();
 };
 
