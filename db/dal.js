@@ -134,14 +134,28 @@ const gen_id = (errors = []) => coerceToLong(snowmachine.generate().snowflake);
  **
  */
 
+const createUser = async (user) => {
+	const user_id = gen_id();
+	const record = Object.assign({}, user, {user_id});
+	return getUserByEmail({email: record.email}).then(user => {
+		if (user)
+			throw [`A user already exists with the email address ${record.email}`];
+		schemas.User.getInsertStmt(record); // invoke validation methods and throw if we're missing a password or something; ignore the output if OK
+	}).then(() => hash(record.password)
+		.then(hashed_password => {
+			record.password = hashed_password;
+			const query = schemas.User.getInsertStmt(record);
+			logger.debug(JSON.stringify(query));
+			return db.query(...query).then(_ => user_id);
 		})
 	);
 };
+const getUserById = async () => {throw ['Unimplemented'];};
+const getUserByEmail = async ({email}) => {
+	const query = ['SELECT user_id, email, first_name, last_name FROM users WHERE email = $1;', [email]];
+	logger.debug(JSON.stringify(query));
+	return db.query(...query).then(res => res.rows.map(convertTypesForDistribution)[0]);
 };
-*/
-		
-const createUser = async () => {throw ['Unimplemented'];};
-const getUser = async () => {throw ['Unimplemented'];};
 const updateUser = async () => {throw ['Unimplemented'];};
 const authenticate = async () => {throw ['Unimplemented'];};
 const searchUsers = async () => {throw ['Unimplemented'];};
@@ -182,7 +196,7 @@ module.exports = ({db, snowmachine}) => {
 	configure({db});
 	return {
 		schemas, executeRaw, executeBatch, db
-		, createUser, getUser, updateUser, authenticate, searchUsers
+		, createUser, getUserById, getUserByEmail, updateUser, authenticate, searchUsers
 		, getCalendarsByUser, getCalendarDetails, getCalendarEventsByCalendar, getCalendarEventsByUser, updateCalendars
 		, createFriendship, acceptFriendship, declineFriendship, endFriendship
 	//, createGuild, getGuilds, updateGuild, deleteGuild
@@ -191,4 +205,3 @@ module.exports = ({db, snowmachine}) => {
 	//, createUser, getUsers, updateUser, deleteUser, authenticate
 	//, createIcon, getIcon, iconExists
 };
-}
