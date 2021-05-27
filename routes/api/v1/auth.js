@@ -17,35 +17,36 @@ const { requireAuth, requireNotAuth, handle } = require(require.main.path + '/ro
 
 const createUser = (req, res) => {
 	dal.createUser(req.body)
-	.then(user_id => {
-		req.session.user_id = user_id.toString(); // log them in
-		res.header('Location', `/api/${ver}/${branch}`);
-		res.sendStatus(201);
-	})
-	.catch(handle(req, res));
+		.then(user_id => {
+			req.session.user_id = user_id.toString(); // log them in
+			res.header('Location', `/api/${ver}/${branch}`);
+			res.sendStatus(201);
+		})
+		.catch(handle(req, res));
 };
 
-// Authorize the user by assigning them a session/cookie
-const authorize = (req, res, next) => {
-	dal.authenticate({email: req.body.email, password: req.body.password}).then(user_id => {
-		if (user_id) {
-			req.session.user_id = user_id.toString();
-			res.statusMessage = 'Authorized';
-			res.status(204).end();
+// Authenticate the user by assigning them a session/cookie
+const authenticate = (req, res, next) => {
+	dal.authenticate({email: req.body.email, password: req.body.password})
+		.then(user_id => {
+			if (user_id) {
+				req.session.user_id = user_id.toString();
+				res.statusMessage = 'Authenticated';
+				res.status(204).end();
+				return;
+			}
+			res.sendStatus(401);
 			return;
-		}
-		res.sendStatus(401);
-		return;
-	})
+		})
 		.catch(handle(req, res));
 };
 
 const hasAuth = (req, res) => {
 	res.end('You have a session');
-}
+};
 const doesntHasAauth = (req, res) => {
 	res.end('You do not haas a session')
-}
+};
 
 const getUserInfo = (req, res) => {
 	dal.getUserById({user_id: req.session.user_id}).then(user => {
@@ -72,7 +73,7 @@ const routes = [
 	, {
 		uris: `/api/${ver}/${branch}`
 		, methods: ['post']
-		, handlers: authorize
+		, handlers: authenticate
 	}
 	, {
 		uris: `/api/${ver}/${branch}`
