@@ -59,6 +59,9 @@ const routeFiles = [
 	  'api/v0/friends'
 	, 'api/v0/calendars'
 	, 'api/v0/auth'
+	, 'api/v1/friends'
+	, 'api/v1/calendars'
+	, 'api/v1/auth'
 ];
 const routeManager = require('./routes/manager');
 routeFiles.forEach((file) => {
