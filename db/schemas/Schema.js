@@ -84,7 +84,7 @@ module.exports = class Schema {
 		switch (input?.constructor.name) {
 			case 'Long':
 				return input.toString();
-			default: console.log(input.constructor.name); return input;
+			default: return input;
 		}
 	}
 

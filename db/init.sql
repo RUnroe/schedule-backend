@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS Calendars (
 	,     user_id bigint                          NOT NULL REFERENCES Users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 	,        name varchar(64)
 	,         url varchar(2000)                   NOT NULL
+	,     enabled boolean                         NOT NULL
 );
 
 -- If accepted is false, then User A has requested to be
