@@ -164,7 +164,21 @@ const updateUser = async ({user_id, first_name, last_name}) => {
 	logger.debug(JSON.stringify(query));
 	return db.query(...query).then(res => undefined);
 };
-const authenticate = async () => {throw ['Unimplemented'];};
+const authenticate = async ({email, password}) => {
+	const query = ['SELECT user_id, password FROM users WHERE email = $1', [email]];
+	logger.debug(JSON.stringify(query));
+	return db.query(...query)
+		.then(res => res.rows.map(convertTypesForDistribution)[0])
+		.then(result => {
+			if (result)
+				return verify_hash(result?.password, password).then(ok => {
+					if (ok) return result.user_id;
+					else return undefined;
+				});
+			else return undefined; // should mebbe verify another hash here anyways to prevent side-channel timing attacks, except that's kinda pointless on a server with unpredictable latency...right?
+		})
+	;
+};
 const searchUsers = async () => {throw ['Unimplemented'];};
 
 const getCalendarsByUser = async () => {throw ['Unimplemented'];};
