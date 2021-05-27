@@ -179,13 +179,17 @@ const authenticate = async ({email, password}) => {
 		})
 	;
 };
-const searchUsers = async () => {throw ['Unimplemented'];};
 
 const getCalendarsByUser = async () => {throw ['Unimplemented'];};
 const getCalendarDetails = async () => {throw ['Unimplemented'];};
 const getCalendarEventsByCalendar = async () => {throw ['Unimplemented'];};
 const updateCalendars = async () => {throw ['Unimplemented'];};
 
+const searchFriends = async ({user_id, user_name}) => {
+	const query = [];
+	logger.debug(JSON.stringify(query));
+	throw ['Unimplemented'];
+};
 const createFriendship = async () => {throw ['Unimplemented'];};
 const acceptFriendship = async () => {throw ['Unimplemented'];};
 const declineFriendship = async () => {throw ['Unimplemented'];};
@@ -220,8 +224,8 @@ module.exports = ({db, snowmachine}) => {
 	logger.info('Configured DAL.');
 	return {
 		schemas, executeRaw, executeBatch, db
-		, createUser, getUserById, getUserByEmail, updateUser, authenticate, searchUsers
+		, createUser, getUserById, getUserByEmail, updateUser, authenticate
 		, getCalendarsByUser, getCalendarDetails, getCalendarEventsByCalendar, getCalendarEventsByUser, updateCalendars
-		, createFriendship, acceptFriendship, declineFriendship, endFriendship
+		, searchFriends, createFriendship, acceptFriendship, declineFriendship, endFriendship
 	};
 };
