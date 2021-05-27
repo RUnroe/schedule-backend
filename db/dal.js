@@ -109,7 +109,7 @@ const coerceToLong = (x, errors = []) => { // error list may be omitted; if it d
 	return null;
 };
 
-const gen_id = (errors = []) => coerceToLong(snowmachine.generate().snowflake);
+const gen_id = (errors = []) => snowmachine.generate().snowflake.toString(); // frick longs
 
 /*
  ** guidelines for designing these methods
