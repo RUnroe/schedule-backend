@@ -1,4 +1,6 @@
 const logger = require('logger').get('dal');
+const fetch = require('node-fetch');
+const ics2json = require('ics-to-json').default;
 
 let db, snowmachine;
 const configure = (obj) => {
@@ -21,6 +23,18 @@ const hash = async (pw) => {
 		});
 };
 const verify_hash = (hash, input) => hasher.verify(hash, input);
+
+const ISO8601SimplifiedToDate = (iso) => {
+	let [date, time] = iso?.split('T') || [];
+	time?.replace('Z','-0000');
+	let [localtime, tz] = (time || '000000Z')?.split(/(?=[-+])|Z/) || [];
+	date = date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+	localtime = localtime.replace(/(\d{2})(\d{2})(\d{2})/, '$1:$2:$3');
+	tz = (tz || '-0000').replace(/(\d{2})(\d{2})/, '$1:$2');
+	const out = `${date}T${localtime}${tz}`;
+	console.log(out);
+	return new Date(out).toISOString();
+};
 
 // takes data from database and converts anything necessary before shipping data to users
 // e.g. convert snowflakes from Long to string
@@ -275,30 +289,48 @@ const getCalendarDetails = async ({user_id}) => {
 			return out;
 		});
 };
-const getCalendarEventsByUserIds = async () => {throw ['Unimplemented'];};
+// TODO verify that the supplied IDs are friends of the current user
+const getCalendarEventsByUserIds = async ({user_id, friend_ids}) => {
+	const all_ids = [user_id, ...friend_ids];
+	const query = [`SELECT user_id, url FROM calendars WHERE user_id IN (${all_ids.map((_, index) => `$${++index}`).join(', ')});`, all_ids];
+	logger.debug(JSON.stringify(query));
+	return db.query(...query).then(res => res.rows
+		.map(convertTypesForDistribution)
+	)
+		.then(async results => {
+			const out = {};
+			// group urls by user
+			for (let user_id of all_ids) {
+				out[user_id] = (
+					await Promise.all(results
+						.filter(cal => cal.user_id === user_id)
+						.map(cal => cal.url)
+						.map(url => fetch(url)
+							.then(res => res.text())
+							.then(res => ics2json(res)
+								.map(({startDate, endDate}) => ({start: startDate, end: endDate}))
+								.map(({start, end}) => ({
+									start: ISO8601SimplifiedToDate(start)
+									, end: ISO8601SimplifiedToDate(end)
+								}))
+							)
+						)
+					).catch(logger.error)// HEY if something crashes, comment this out
+				).flat();
+			}
+			return out;
+		});
+};
 
 const searchFriends = async ({user_id, user_name}) => {
 	const query = [];
 	logger.debug(JSON.stringify(query));
-	throw ['Unimplemented'];
+	throw 'Unimplemented';
 };
-const createFriendship = async () => {throw ['Unimplemented'];};
-const acceptFriendship = async () => {throw ['Unimplemented'];};
-const declineFriendship = async () => {throw ['Unimplemented'];};
-const endFriendship = async () => {throw ['Unimplemented'];};
-
-const getCalendarEventsByUser = async (user_id) => {
-	const errors = [];
-	user_id = coerceToLong(user_id, errors);
-
-	if (errors.length) {
-		throw errors;
-	}
-
-	return db.execute('SELECT url FROM calendars WHERE user_id = ?', [user_id], { prepare: true })
-		.then(res => res.rows)
-	;
-};
+const createFriendship = async () => {throw 'Unimplemented';};
+const acceptFriendship = async () => {throw 'Unimplemented';};
+const declineFriendship = async () => {throw 'Unimplemented';};
+const endFriendship = async () => {throw 'Unimplemented';};
 
 const executeRaw = async (stmt, params) => {
 	return db.execute(stmt, params, { prepare: true });
