@@ -2,7 +2,12 @@ const { ver } = require('./config');
 const branch = 'calendars';
 const logger = require('logger').get(`api::${ver}::${branch}`);
 
-const snowmachine = new (require('snowflake-generator'))(1420070400000);
+const dal = {};
+const configure = (obj) => {
+	Object.assign(dal, obj.dal);
+};
+
+const { requireAuth, requireNotAuth, handle } = require(require.main.path + '/routes/util');
 
 const calendars = (req, res) => {
 	res.json(
@@ -101,4 +106,4 @@ const routes = [
 	}
 ];
 
-module.exports = { logger, routes };
+module.exports = { logger, routes, configure };
