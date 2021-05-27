@@ -2,6 +2,7 @@
 
 // TODO: enforce foreign key constraints
 
+// This Schema class has been written for compatibility with node-postgres.
 module.exports = class Schema {
 	constructor(name, keys = [], requireds = [], nullables = [], immutables = [], automatics = [], update_keys = [], typeSamples = {}, validators = [], permitNulls = false) {
 
@@ -88,13 +89,17 @@ module.exports = class Schema {
 		const columns = Object.keys(record);
 		const params = Object.values(record);
 
-		const column_string = columns.join(', ');
-		const value_string = columns.map(x => '?').join(', ');
+		const column_string = columns.map(c => c /*+ (this.typeSamples[c]?.constructor.name === 'Long' ? '::bigint' : '')*/).join(', ');
+		const value_string = columns.map((_, index) => `$${index+1}`).join(', ');
 
 		return [
 			`INSERT INTO ${this.name} (${column_string}) VALUES (${value_string});`
-			, params
-			, { prepare: true }
+			, params.map(param => {
+				switch (param?.constructor.name) {
+					case 'Long': return param.toString();
+					default: return param;
+				}
+			})
 		];
 	}
 
@@ -102,7 +107,6 @@ module.exports = class Schema {
 		return [
 			`SELECT * FROM ${this.name} ${criteria};`
 			, params
-			, { prepare: true }
 		];
 	}
 
@@ -124,13 +128,12 @@ module.exports = class Schema {
 		});
 		for (let key of columns) params.push(changes[key]);
 		for (let key of update_keys) params.push(changes[key]);
-		const column_string = columns.map(c => c + ' = ?').join(', ');
-		const key_string = update_keys.map(c => c + ' = ?').join(' AND ');
+		const column_string = columns.map((c, index) => `${c} = $${index+1}`).join(', ');
+		const key_string = update_keys.map((c, index) => `${c} = $${index+1}`).join(' AND ');
 
 		return [
 			`UPDATE ${this.name} SET ${column_string} WHERE ${key_string};`
 			, params
-			, { prepare: true }
 		];
 	}
 
@@ -149,11 +152,10 @@ module.exports = class Schema {
 		const columns = Object.keys(criteria);
 		const params = columns.map(key => criteria[key]);
 
-		const criteria_string = columns.map(c => c + ' = ?').join(' AND ');
+		const criteria_string = columns.map((c, index) => `${c} = $${index+1}`).join(' AND ');
 		return [
 			`DELETE FROM ${this.name} WHERE ${criteria_string};`
 			, params
-			, { prepare: true }
 		];
 	}
 
