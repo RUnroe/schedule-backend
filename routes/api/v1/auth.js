@@ -2,11 +2,9 @@ const { ver } = require('./config');
 const branch = 'auth';
 const logger = require('logger').get(`api::${ver}::${branch}`);
 
-const dal = {}, snowmachine = {};
-
+const dal = {};
 const configure = (obj) => {
 	Object.assign(dal, obj.dal);
-	Object.assign(snowmachine, obj.snowmachine);
 };
 
 const { requireAuth, requireNotAuth, handle } = require(require.main.path + '/routes/util');
