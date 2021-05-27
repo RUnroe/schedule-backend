@@ -67,10 +67,8 @@ routeFiles.forEach((file) => {
 	if(component.configure) component.configure({
 		// pass stuff to routing files here
 		// dependency injection :tm:
-		//db
-		//, io
-		//, snowmachine
-		//, upload
+		dal
+		, snowmachine
 	});
 	routeManager.apply(app, component);
 	logger.info(`Added ${file} routes.`);

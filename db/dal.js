@@ -193,15 +193,14 @@ const executeBatch = async (stmts) => {
 };
 
 module.exports = ({db, snowmachine}) => {
-	configure({db});
+	console.log(snowmachine);
+	logger.info('Configuring DAL...');
+	configure({db, snowmachine});
+	logger.info('Configured DAL.');
 	return {
 		schemas, executeRaw, executeBatch, db
 		, createUser, getUserById, getUserByEmail, updateUser, authenticate, searchUsers
 		, getCalendarsByUser, getCalendarDetails, getCalendarEventsByCalendar, getCalendarEventsByUser, updateCalendars
 		, createFriendship, acceptFriendship, declineFriendship, endFriendship
-	//, createGuild, getGuilds, updateGuild, deleteGuild
-	//, createChannel, getChannels, updateChannel, deleteChannel, clearChannels, addChannelToGuild // FIXME that last one doesn't work yet
-	//, createMessage, getMessages, updateMessage, deleteMessage
-	//, createUser, getUsers, updateUser, deleteUser, authenticate
-	//, createIcon, getIcon, iconExists
+	};
 };
