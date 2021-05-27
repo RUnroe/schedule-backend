@@ -9,10 +9,23 @@ const requireNotAuth = (redirect) => (req, res, next) => {
 };
 
 // use as someAsyncThing().then(yada).catch(handle(500, req, res));
-const handle = (code, req, res) => {
-	return (errors) => {
-		if (process.env.NODE_ENV === 'debug') console.error(errors);
-		res.status(code).json(errors);
+const handle = (req, res, code) => {
+	switch (code) {
+		case undefined:
+		case null:
+			return (errors) => {
+				switch (errors?.constructor.name) {
+					case 'Array': // the application code will only throw arrays, by convention that i chose
+						return handle(req, res, 400)(errors); // blame the user
+					default:
+						return handle(req, res, 500)(errors); // who knows
+				}
+			}
+		default:
+			return (errors) => {
+				if (process.env.NODE_ENV === 'debug') console.error(errors);
+				res.status(code).json(errors);
+			}
 	}
 };
 

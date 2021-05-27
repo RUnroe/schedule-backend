@@ -12,6 +12,15 @@ const hasher = require('argon2');
 const hash_options = {
 	type: hasher.argon2id
 };
+const hash = async (pw) => {
+	return hasher.hash(pw, hash_options)
+		.catch(err => {
+			const error_id = gen_id();
+			logger.error(JSON.stringify([error_id.toString(), err]));
+			throw ['An error occurred while hashing the supplied password. Please report this error to the developers, along with this number: ' + error_id];
+		});
+};
+const verify_hash = (hash, input) => hasher.verify(hash, input);
 
 // takes data from database and converts anything necessary before shipping data to users
 // e.g. convert snowflakes from Long to string
@@ -99,6 +108,8 @@ const coerceToLong = (x, errors = []) => { // error list may be omitted; if it d
 	}
 	return null;
 };
+
+const gen_id = (errors = []) => coerceToLong(snowmachine.generate().snowflake);
 
 /*
  ** guidelines for designing these methods
