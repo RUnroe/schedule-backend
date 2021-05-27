@@ -1,4 +1,3 @@
-const Long = require('long');
 const Schema = require('./Schema');
 
 module.exports = new Schema(
@@ -10,8 +9,8 @@ module.exports = new Schema(
 	, ['calendar_id'] // automatics
 	, ['calendar_id', 'user_id'] // update keys
 	, { // type samples
-		'calendar_id': new Long()
-		, 'user_id': new Long()
+		'calendar_id': ''
+		, 'user_id': ''
 		, 'name': ''
 		, 'url': ''
 	}

@@ -1,4 +1,3 @@
-const Long = require('long');
 const Schema = require('./Schema');
 
 module.exports = new Schema(
@@ -10,9 +9,9 @@ module.exports = new Schema(
 	, ['friendship_id'] // automatics
 	, ['friendship_id'] // update keys
 	, { // type samples
-		'friendship_id': new Long()
-		, 'user_a_id': new Long()
-		, 'user_b_id': new Long()
+		'friendship_id': ''
+		, 'user_a_id': ''
+		, 'user_b_id': ''
 		, 'accepted': false
 	}
 	, [ // validators

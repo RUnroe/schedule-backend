@@ -1,4 +1,3 @@
-const Long = require('long');
 const Schema = require('./Schema');
 
 module.exports = new Schema(
@@ -10,7 +9,7 @@ module.exports = new Schema(
 	, ['user_id'] // automatics
 	, ['user_id'] // update keys
 	, { // type samples
-		'user_id': new Long()
+		'user_id': ''
 		, 'first_name': ''
 		, 'last_name': ''
 		, 'password': ''
