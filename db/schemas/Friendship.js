@@ -3,14 +3,14 @@ const Schema = require('./Schema');
 
 module.exports = new Schema(
 	'Friendships'
-	, ['id', 'user_a_id', 'user_b_id', 'accepted'] // keys
-	, ['id'] // requireds
+	, ['friendship_id', 'user_a_id', 'user_b_id', 'accepted'] // keys
+	, ['friendship_id'] // requireds
 	, [] // nullables
-	, ['id', 'user_a_id', 'user_b_id'] // immutables
-	, ['id'] // automatics
-	, ['id'] // update keys
+	, ['friendship_id', 'user_a_id', 'user_b_id'] // immutables
+	, ['friendship_id'] // automatics
+	, ['friendship_id'] // update keys
 	, { // type samples
-		'id': new Long()
+		'friendship_id': new Long()
 		, 'user_a_id': new Long()
 		, 'user_b_id': new Long()
 		, 'accepted': false

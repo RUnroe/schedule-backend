@@ -21,20 +21,20 @@ $$ language 'plpgsql'
 -- unique fields, so we don't have to manually index those.
 
 CREATE TABLE IF NOT EXISTS Users (
-	          id bigint       PRIMARY KEY UNIQUE NOT NULL
-	, first_name varchar(64)
-	,  last_name varchar(64)
-	,   password varchar(128)                    NOT NULL
-	,      email varchar(254)             UNIQUE NOT NULL
+	      user_id bigint       PRIMARY KEY UNIQUE NOT NULL
+	,  first_name varchar(64)
+	,   last_name varchar(64)
+	,    password varchar(128)                    NOT NULL
+	,       email varchar(254)             UNIQUE NOT NULL
  -- see max length of any forward- or reverse-path is 256
  -- including angle brackets, in RFC 5321 (SMTP)
 );
 
 CREATE TABLE IF NOT EXISTS Calendars (
-	          id bigint       PRIMARY KEY UNIQUE NOT NULL
-	,    user_id bigint                          NOT NULL REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE
-	,       name varchar(64)
-	,        url varchar(2000)                   NOT NULL
+	  calendar_id bigint       PRIMARY KEY UNIQUE NOT NULL
+	,     user_id bigint                          NOT NULL REFERENCES Users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+	,        name varchar(64)
+	,         url varchar(2000)                   NOT NULL
 );
 
 -- If accepted is false, then User A has requested to be
@@ -43,10 +43,10 @@ CREATE TABLE IF NOT EXISTS Calendars (
 -- friendship is accepted; if User B declines, then the
 -- friendship is deleted.
 CREATE TABLE IF NOT EXISTS Friendships (
-	          id bigint       PRIMARY KEY UNIQUE NOT NULL
-	,  user_a_id bigint                          NOT NULL REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE
-	,  user_b_id bigint                          NOT NULL REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE
-	,   accepted boolean                         NOT NULL
+	friendship_id bigint       PRIMARY KEY UNIQUE NOT NULL
+	,   user_a_id bigint                          NOT NULL REFERENCES Users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+	,   user_b_id bigint                          NOT NULL REFERENCES Users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+	,    accepted boolean                         NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS IDX_Friendships_user_a_id ON Friendships (user_a_id);

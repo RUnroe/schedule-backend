@@ -3,14 +3,14 @@ const Schema = require('./Schema');
 
 module.exports = new Schema(
 	'Calendars'
-	, ['id', 'user_id', 'name', 'url'] // keys
-	, ['id'] // requireds
+	, ['calendar_id', 'user_id', 'name', 'url'] // keys
+	, ['calendar_id'] // requireds
 	, ['name'] // nullables
-	, ['id', 'user_id'] // immutables
-	, ['id'] // automatics
-	, ['id', 'user_id'] // update keys
+	, ['calendar_id', 'user_id'] // immutables
+	, ['calendar_id'] // automatics
+	, ['calendar_id', 'user_id'] // update keys
 	, { // type samples
-		'id': new Long()
+		'calendar_id': new Long()
 		, 'user_id': new Long()
 		, 'name': ''
 		, 'url': ''

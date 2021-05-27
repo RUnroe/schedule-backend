@@ -1,5 +1,9 @@
 const logger = require('logger').get('db');
 
+// The thinking here is to use dbSync for startup stuff so we don't
+// move on with the application until tables are created and whatnot.
+// The rest of the application logic can use the async db pool.
+
 logger.info('Instantiating database connections...');
 const db = new (require('pg').Pool)();
 const dbSync = new (require('pg-native'))();

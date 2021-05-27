@@ -3,14 +3,14 @@ const Schema = require('./Schema');
 
 module.exports = new Schema(
 	'Users'
-	, ['id', 'first_name', 'last_name', 'password', 'email'] // keys
-	, ['id'] // requireds
+	, ['user_id', 'first_name', 'last_name', 'password', 'email'] // keys
+	, ['user_id'] // requireds
 	, ['first_name', 'last_name'] // nullables
-	, ['id', 'email', 'password'] // immutables
-	, ['id'] // automatics
-	, ['id'] // update keys
+	, ['user_id', 'email', 'password'] // immutables
+	, ['user_id'] // automatics
+	, ['user_id'] // update keys
 	, { // type samples
-		'id': new Long()
+		'user_id': new Long()
 		, 'first_name': ''
 		, 'last_name': ''
 		, 'password': ''
