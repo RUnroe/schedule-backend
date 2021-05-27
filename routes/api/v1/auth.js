@@ -18,7 +18,7 @@ const { requireAuth, requireNotAuth, handle } = require(require.main.path + '/ro
 const createUser = (req, res) => {
 	dal.createUser(req.body)
 	.then(user_id => {
-		req.session.user_id = user_id; // log them in
+		req.session.user_id = user_id.toString(); // log them in
 		res.header('Location', `/api/${ver}/${branch}`);
 		res.sendStatus(201);
 	})
@@ -27,9 +27,9 @@ const createUser = (req, res) => {
 
 // Authorize the user by assigning them a session/cookie
 const authorize = (req, res, next) => {
-	dal.authenticate(req.body.email, req.body.password).then(user_id => {
+	dal.authenticate({email: req.body.email, password: req.body.password}).then(user_id => {
 		if (user_id) {
-			req.session.user_id = user_id;
+			req.session.user_id = user_id.toString();
 			res.statusMessage = 'Authorized';
 			res.status(204).end();
 			return;
