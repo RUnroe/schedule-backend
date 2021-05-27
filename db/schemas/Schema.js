@@ -79,6 +79,15 @@ module.exports = class Schema {
 		return this.keys.filter(key => !this.immutables.includes(key));
 	}
 
+	// convert Long to string, etc.
+	convertTypesForDb(input) {
+		switch (input?.constructor.name) {
+			case 'Long':
+				return input.toString();
+			default: console.log(input.constructor.name); return input;
+		}
+	}
+
 	getInsertStmt(record) {
 		record = this.trim(record);
 		const errors = this.validate(record, false);
@@ -94,19 +103,18 @@ module.exports = class Schema {
 
 		return [
 			`INSERT INTO ${this.name} (${column_string}) VALUES (${value_string});`
-			, params.map(param => {
-				switch (param?.constructor.name) {
-					case 'Long': return param.toString();
-					default: return param;
-				}
-			})
+			, params.map(this.convertTypesForDb)
 		];
 	}
 
-	getSelectStmt(criteria = '', params = []) {
+	//getSelectStmt(criteria = '', params = []) {
+	getSelectStmt(criteria) {
+		criteria = this.trim(criteria);
+		const columns = Object.keys(criteria).length ? 'WHERE ' + Object.keys(criteria).map((c, index) => `${c} = $${index+1}`).join(' AND ') : '';
+		const params = Object.values(criteria);
 		return [
-			`SELECT * FROM ${this.name} ${criteria};`
-			, params
+			`SELECT * FROM ${this.name} ${columns};`
+			, params.map(this.convertTypesForDb)
 		];
 	}
 
