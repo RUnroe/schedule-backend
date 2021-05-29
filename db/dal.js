@@ -27,12 +27,11 @@ const verify_hash = (hash, input) => hasher.verify(hash, input);
 const ISO8601SimplifiedToDate = (iso) => {
 	let [date, time] = iso?.split('T') || [];
 	time?.replace('Z','-0000');
-	let [localtime, tz] = (time || '000000Z')?.split(/(?=[-+])|Z/) || [];
+	let [localtime, tz] = (time || '')?.split(/(?=[-+])|Z/) || [];
 	date = date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
 	localtime = localtime.replace(/(\d{2})(\d{2})(\d{2})/, '$1:$2:$3');
-	tz = (tz || '-0000').replace(/(\d{2})(\d{2})/, '$1:$2');
+	tz = (tz || '').replace(/(\d{2})(\d{2})/, '$1:$2');
 	const out = `${date}T${localtime}${tz}`;
-	console.log(out);
 	return new Date(out).toISOString();
 };
 
@@ -248,12 +247,6 @@ const updateCalendars = async ({user_id, calendars}) => {
 			changedCalendars.push(JSON.parse(i));
 		}
 
-	//console.log('newCalendars', newCalendars);
-	//console.log('deletedCalendars', deletedCalendars);
-	//console.log('overlappingInputCalendars', overlappingInputCalendars);
-	//console.log('overlappingExistingCalendars', overlappingExistingCalendars);
-	//console.log('changedCalendars', changedCalendars);
-
 	// Insert the new calendars
 	for (let cal of newCalendars) {
 		cal.calendar_id = gen_id();
@@ -342,7 +335,6 @@ const executeBatch = async (stmts) => {
 };
 
 module.exports = ({db, snowmachine}) => {
-	console.log(snowmachine);
 	logger.info('Configuring DAL...');
 	configure({db, snowmachine});
 	logger.info('Configured DAL.');
