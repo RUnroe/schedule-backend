@@ -24,15 +24,21 @@ const hash = async (pw) => {
 };
 const verify_hash = (hash, input) => hasher.verify(hash, input);
 
-const ISO8601SimplifiedToDate = (iso) => {
-	let [date, time] = iso?.split('T') || [];
-	time?.replace('Z','-0000');
-	let [localtime, tz] = (time || '')?.split(/(?=[-+])|Z/) || [];
-	date = date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-	localtime = localtime.replace(/(\d{2})(\d{2})(\d{2})/, '$1:$2:$3');
-	tz = (tz || '').replace(/(\d{2})(\d{2})/, '$1:$2');
-	const out = `${date}T${localtime}${tz}`;
-	return new Date(out).toISOString();
+const ISO8601SimplifiedToDate = (iso, floor = true) => { // round down? or round up
+	try {
+		let [date, time] = iso?.split('T') || [];
+		date = date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+		if (!time) return date + 'T' + (floor ? '00:00:00' : '23:59:59' ); // give up on timestamps with no time
+		time = time.replace('Z','-0000'); // normalize format
+		let [localtime, tz] = time.split(/(?=[-+])/);
+		console.log(date, time, localtime, tz);
+		localtime = localtime.replace(/(\d{2})(\d{2})/, '$1:$2'); // split hours from minutes
+		localtime = localtime.replace(/(\d{2})(\d{2})/, '$1:$2'); // split minutes from seconds, if present
+		tz = tz.replace(/(\d{2})(\d{2})/, '$1:$2'); // split hours from minutes
+		const out = `${date}T${localtime}${tz}`;
+		console.log(out);
+		return out; //new Date(out).toISOString();
+	} catch { return; }
 };
 
 // takes data from database and converts anything necessary before shipping data to users
@@ -303,12 +309,12 @@ const getCalendarEventsByUserIds = async ({user_id, friend_ids}) => {
 							.then(res => ics2json(res)
 								.map(({startDate, endDate}) => ({start: startDate, end: endDate}))
 								.map(({start, end}) => ({
-									start: ISO8601SimplifiedToDate(start)
-									, end: ISO8601SimplifiedToDate(end)
+									start: ISO8601SimplifiedToDate(start, true)
+									, end: ISO8601SimplifiedToDate(end, false)
 								}))
 							)
 						)
-					).catch(logger.error)// HEY if something crashes, comment this out
+					)//.catch(logger.error)// HEY if something crashes, comment this out
 				).flat();
 			}
 			return out;
