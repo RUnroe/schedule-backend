@@ -52,6 +52,13 @@ const friends = (req, res) => {
 	);
 };
 
+const add_friend = (req, res) => {
+	dal.createFriendship({user_id: req.session.user_id, target_user_id: req.params.target_user_id})
+		.then(() => res.end())
+		.catch(handle(req, res))
+	;
+};
+
 const routes = [
 	{
 		uris: `/api/${ver}/${branch}`
