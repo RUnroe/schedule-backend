@@ -22,7 +22,7 @@ logger.info('Instantiated globals.');
 
 logger.info("Configuring Express...");
 app.use(express.static(path.join(__dirname + "/public")));
-app.set("trust proxy", 1);
+app.set("trust proxy", 2);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // https://stackoverflow.com/a/15819481/6627273
