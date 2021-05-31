@@ -56,23 +56,28 @@ const routes = [
 	{
 		uris: `/api/${ver}/${branch}`
 		, methods: 'get'
-		, handlers: friends
+		, handlers: [requireAuth(), friends]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/search`
 		, methods: 'get'
-		, handlers: search
+		, handlers: [requireAuth(), search]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/current`
 		, methods: 'get'
-		, handlers: current
+		, handlers: [requireAuth(), current]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/pending`
 		, methods: 'get'
-		, handlers: pending
+		, handlers: [requireAuth(), pending]
+	}
+	, {
+		uris: `/api/${ver}/${branch}/:target_user_id`
+		, methods: 'post'
+		, handlers: [requireAuth(), add_friend]
 	}
 ];
 
-module.exports = { logger, routes };
+module.exports = { logger, routes, configure };
