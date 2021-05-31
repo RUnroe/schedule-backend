@@ -19,7 +19,7 @@ module.exports = (dbSync, pool) => {
 		, saveUninitialized: false
 		, cookie: {
 			maxAge: 1000*60*60*24*(process.env.SESSION_LIFETIME_DAYS || 90)
-			, sameSite: false // frickin localhost frick frick frickin fricks frick
+			, sameSite: 'none' // frickin localhost frick frick frickin fricks frick
 			, secure: false // we don't require https because we live behind a reverse proxy that handles that for us, duh
 			, httpOnly: true
 		}
