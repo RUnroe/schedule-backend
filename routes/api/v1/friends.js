@@ -15,6 +15,14 @@ const search = (req, res) => {
 		.catch(handle(req, res));
 };
 
+const list_friends = async (req, res) => {
+	dal.getFriendships({user_id: req.session.user_id})
+	.then(current =>
+		dal.getPendingFriendships({user_id: req.session.user_id})
+		.then(pending =>
+			res.json({current, pending})
+		)
+	).catch(handle(req, res));
 };
 
 const list_current_friends = (req, res) => {
@@ -23,21 +31,6 @@ const list_current_friends = (req, res) => {
 	.catch(handle(req, res));
 };
 
-const friends = (req, res) => {
-	res.json(
-		{
-  "current": {
-    "18162838739488302": { "user_id": "18162393822390029", "name": "Joe Mama"  }
-  , "18162833478388302": { "user_id": "18162393822390030", "name": "Joe Manga" }
-  , "18162833434328302": { "user_id": "18162393822390031", "name": "Banjoe Ma" }
-  }
-, "pending": {
-    "18162838739488302": { "user_id": "18162393822390029", "name": "Joe Mama"  }
-  , "18162833478388302": { "user_id": "18162393822390030", "name": "Joe Manga" }
-  , "18162833434328302": { "user_id": "18162393822390031", "name": "Banjoe Ma" }
-  }
-}
-	);
 const list_pending_friends = (req, res) => {
 	dal.getPendingFriendships({user_id: req.session.user_id})
 	.then(() => res.end())
