@@ -54,7 +54,12 @@ const friends = (req, res) => {
 
 const add_friend = (req, res) => {
 	dal.createFriendship({user_id: req.session.user_id, target_user_id: req.params.target_user_id})
-		.then(() => res.end())
+		.then(friendship_id => {
+			res.status(202);
+			res.statusMessage = 'Friendship Pending';
+			res.set('Location', `/api/${ver}/${branch}/${friendship_id}`);
+			res.end();
+		})
 		.catch(handle(req, res))
 	;
 };

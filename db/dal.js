@@ -352,10 +352,17 @@ LIMIT 10;`, [user_id, user_name]];
 	})))
 	.then(res => {console.log(res); return res;})
 	;
+};
+// TODO check whether (b,a) already exists, and if it does, then call acceptFriendship instead
+// lol we're not gonna handle that ever
+const createFriendship = async ({user_id, target_user_id}) => {
+	const friendship_id = gen_id();
+	const query = [`INSERT INTO friendships (friendship_id, user_a_id, user_b_id, accepted) VALUES ($1, $2, $3, false) ON CONFLICT DO NOTHING;`, [friendship_id, user_id, target_user_id]];
+	logger.debug(JSON.stringify(query));
+	return db.query(...query).then(() => friendship_id);
 	logger.debug(JSON.stringify(query));
 	throw 'Unimplemented';
 };
-const createFriendship = async () => {throw 'Unimplemented';};
 const acceptFriendship = async () => {throw 'Unimplemented';};
 const declineFriendship = async () => {throw 'Unimplemented';};
 const endFriendship = async () => {throw 'Unimplemented';};
