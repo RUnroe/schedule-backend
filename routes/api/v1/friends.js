@@ -61,14 +61,14 @@ const add_friend = (req, res) => {
 
 const routes = [
 	{
-		uris: `/api/${ver}/${branch}`
-		, methods: 'get'
-		, handlers: [requireAuth(), friends]
-	}
-	, {
 		uris: `/api/${ver}/${branch}/search`
 		, methods: 'get'
 		, handlers: [requireAuth(), search]
+	}
+	, {
+		uris: `/api/${ver}/${branch}`
+		, methods: 'get'
+		, handlers: [requireAuth(), list_friends]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/current`

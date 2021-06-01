@@ -325,21 +325,33 @@ const getCalendarEventsByUserIds = async ({user_id, friend_ids}) => {
 
 const searchFriends = async ({user_id, user_name}) => {
 	const query = [`
-		SELECT
-		  user_id
-		, first_name||' '::text||last_name AS name
-		FROM
-		  users
-		WHERE
-		  (NOT user_id = $1)
-		    AND
-		  (first_name||' '::text||last_name ILIKE '%'||$2||'%')
-		LIMIT 10
-		;`, [user_id, user_name]];
+SELECT
+  users.user_id
+  , users.first_name||' '::text||users.last_name AS name
+  , friendships.friendship_id
+FROM
+  users
+LEFT OUTER JOIN
+  friendships
+ON
+  (users.user_id = friendships.user_b_id)
+WHERE
+  (NOT users.user_id = $1)
+    AND
+  (first_name||' '::text||last_name ILIKE '%'||$2||'%')
+    AND
+  (friendships.user_a_id IS NULL OR friendships.user_a_id = $1)
+LIMIT 10;`, [user_id, user_name]];
 	logger.debug(JSON.stringify(query));
 	return db.query(...query)
+	.then(res => res.rows.map(convertTypesForDistribution))
+	.then(res => res.map(row => ({
+		user_id: row.user_id
+		, name: row.name
+		, pending: row.friendship_id != null
+	})))
 	.then(res => {console.log(res); return res;})
-	.then(res => res.rows.map(convertTypesForDistribution));
+	;
 	logger.debug(JSON.stringify(query));
 	throw 'Unimplemented';
 };
