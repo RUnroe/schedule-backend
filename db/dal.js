@@ -372,10 +372,10 @@ const declineFriendship = async ({user_id, friendship_id}) => {
 	return db.query(...query).then(res => !!res.rowCount);
 	throw 'Unimplemented';
 };
-const endFriendship = async () => {throw 'Unimplemented';};
 
 const executeRaw = async (stmt, params) => {
 	return db.execute(stmt, params, { prepare: true });
+const endFriendship = declineFriendship;
 };
 
 // [{query: '', params: []}]
