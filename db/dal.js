@@ -289,9 +289,11 @@ const getCalendarDetails = async ({user_id}) => {
 		});
 };
 // TODO verify that the supplied IDs are friends of the current user
+// lol no
+// FIXME big security hole here lmao
 const getCalendarEventsByUserIds = async ({user_id, friend_ids}) => {
 	const all_ids = [user_id, ...friend_ids];
-	const query = [`SELECT user_id, url FROM calendars WHERE user_id IN (${all_ids.map((_, index) => `$${++index}`).join(', ')});`, all_ids];
+	const query = [`SELECT user_id, url FROM calendars WHERE enabled = true AND user_id IN (${all_ids.map((_, index) => `$${++index}`).join(', ')});`, all_ids];
 	logger.debug(JSON.stringify(query));
 	return db.query(...query).then(res => res.rows
 		.map(convertTypesForDistribution)
