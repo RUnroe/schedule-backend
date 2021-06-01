@@ -64,6 +64,20 @@ const add_friend = (req, res) => {
 	;
 };
 
+const delete_friend = (req, res) => {
+	dal.endFriendship({user_id: req.session.user_id, friendship_id: req.params.friendship_id})
+	.then(found => {
+		if (found) {
+			res.status(204);
+			res.statusMessage = 'Friendship Ended </3';
+			res.end();
+		} else {
+			res.sendStatus(404);
+		}
+	})
+	.catch(handle(req, res));
+};
+
 const accept_friend = (req, res) => {
 	dal.acceptFriendship({user_id: req.session.user_id, friendship_id: req.params.friendship_id})
 	.then(found => {
@@ -103,6 +117,11 @@ const routes = [
 		uris: `/api/${ver}/${branch}/:target_user_id`
 		, methods: 'post'
 		, handlers: [requireAuth(), add_friend]
+	}
+	, {
+		uris: `/api/${ver}/${branch}/:friendship_id`
+		, methods: 'delete'
+		, handlers: [requireAuth(), delete_friend]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/:friendship_id`

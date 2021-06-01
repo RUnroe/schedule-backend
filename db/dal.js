@@ -366,10 +366,12 @@ const acceptFriendship = async ({user_id, friendship_id}) => {
 	logger.debug(JSON.stringify(query));
 	return db.query(...query).then(res => !!res.rowCount);
 };
+const declineFriendship = async ({user_id, friendship_id}) => {
+	const query = [`DELETE FROM friendships WHERE (user_a_id = $1 OR user_b_id = $1) AND friendship_id = $2;`, [user_id, friendship_id]];
 	logger.debug(JSON.stringify(query));
+	return db.query(...query).then(res => !!res.rowCount);
 	throw 'Unimplemented';
 };
-const declineFriendship = async () => {throw 'Unimplemented';};
 const endFriendship = async () => {throw 'Unimplemented';};
 
 const executeRaw = async (stmt, params) => {
