@@ -360,10 +360,15 @@ const createFriendship = async ({user_id, target_user_id}) => {
 	const query = [`INSERT INTO friendships (friendship_id, user_a_id, user_b_id, accepted) VALUES ($1, $2, $3, false) ON CONFLICT DO NOTHING;`, [friendship_id, user_id, target_user_id]];
 	logger.debug(JSON.stringify(query));
 	return db.query(...query).then(() => friendship_id);
+};
+const acceptFriendship = async ({user_id, friendship_id}) => {
+	const query = [`UPDATE friendships SET accepted = true WHERE user_b_id = $1 AND friendship_id = $2;`, [user_id, friendship_id]];
+	logger.debug(JSON.stringify(query));
+	return db.query(...query).then(res => !!res.rowCount);
+};
 	logger.debug(JSON.stringify(query));
 	throw 'Unimplemented';
 };
-const acceptFriendship = async () => {throw 'Unimplemented';};
 const declineFriendship = async () => {throw 'Unimplemented';};
 const endFriendship = async () => {throw 'Unimplemented';};
 
