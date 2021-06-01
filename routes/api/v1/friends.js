@@ -15,14 +15,6 @@ const search = (req, res) => {
 		.catch(handle(req, res));
 };
 
-const current = (req, res) => {
-	res.json(
-		{
-  "18162838739488302": { "user_id": "18162393822390029", "name": "Joe Mama"  }
-, "18162833478388302": { "user_id": "18162393822390030", "name": "Joe Manga" }
-, "18162833434328302": { "user_id": "18162393822390031", "name": "Banjoe Ma" }
-}
-	);
 };
 
 const pending = (req, res) => {
@@ -33,6 +25,10 @@ const pending = (req, res) => {
 , "18162833434328302": { "user_id": "18162393822390031", "name": "Banjoe Ma" }
 }
 	);
+const list_current_friends = (req, res) => {
+	dal.getFriendships({user_id: req.session.user_id})
+	.then(friendships => res.json(friendships))
+	.catch(handle(req, res));
 };
 
 const friends = (req, res) => {
@@ -106,7 +102,7 @@ const routes = [
 	, {
 		uris: `/api/${ver}/${branch}/current`
 		, methods: 'get'
-		, handlers: [requireAuth(), current]
+		, handlers: [requireAuth(), list_current_friends]
 	}
 	, {
 		uris: `/api/${ver}/${branch}/pending`

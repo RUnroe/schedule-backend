@@ -376,6 +376,19 @@ const declineFriendship = async ({user_id, friendship_id}) => {
 const executeRaw = async (stmt, params) => {
 	return db.execute(stmt, params, { prepare: true });
 const endFriendship = declineFriendship;
+const getFriendships = async ({user_id}) => {
+	const query = [`SELECT friendship_id, user_a_id, user_b_id, first_name||' '::text||last_name AS name FROM users, friendships WHERE ((user_id = user_a_id AND user_b_id = $1) OR (user_id = user_b_id AND user_a_id = $1)) AND accepted = true;`, [user_id]];
+	logger.debug(JSON.stringify(query));
+	return db.query(...query)
+	.then(res => res.rows.map(convertTypesForDistribution))
+	.then(res => {
+		const out = {};
+		for (let row of res)
+			out[row.friendship_id] = {user_id: user_id === row.user_a_id ? row.user_b_id : row.user_a_id, name: row.name};
+		return out;
+	})
+	.then(res => {console.log(res); return res;})
+	;
 };
 
 // [{query: '', params: []}]
