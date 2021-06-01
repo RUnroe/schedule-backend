@@ -372,9 +372,6 @@ const declineFriendship = async ({user_id, friendship_id}) => {
 	return db.query(...query).then(res => !!res.rowCount);
 	throw 'Unimplemented';
 };
-
-const executeRaw = async (stmt, params) => {
-	return db.execute(stmt, params, { prepare: true });
 const endFriendship = declineFriendship;
 const getFriendships = async ({user_id}) => {
 	const query = [`SELECT friendship_id, user_a_id, user_b_id, first_name||' '::text||last_name AS name FROM users, friendships WHERE ((user_id = user_a_id AND user_b_id = $1) OR (user_id = user_b_id AND user_a_id = $1)) AND accepted = true;`, [user_id]];
@@ -390,10 +387,6 @@ const getFriendships = async ({user_id}) => {
 	.then(res => {console.log(res); return res;})
 	;
 };
-
-// [{query: '', params: []}]
-const executeBatch = async (stmts) => {
-	return db.batch(stmts, { prepare: true });
 const getPendingFriendships = async ({user_id}) => {
 	const query = [`SELECT friendship_id, user_a_id, first_name||' '::text||last_name AS name FROM users, friendships WHERE user_id = user_a_id AND user_b_id = $1 AND accepted = false;`, [user_id]];
 	logger.debug(JSON.stringify(query));
@@ -414,9 +407,9 @@ module.exports = ({db, snowmachine}) => {
 	configure({db, snowmachine});
 	logger.info('Configured DAL.');
 	return {
-		schemas, executeRaw, executeBatch, db
+		schemas, db
 		, createUser, getUserById, getUserByEmail, updateUser, authenticate
 		, updateCalendars, getCalendarDetails, getCalendarEventsByUserIds
-		, searchFriends, createFriendship, acceptFriendship, declineFriendship, endFriendship
+		, searchFriends, createFriendship, getFriendships, getPendingFriendships, acceptFriendship, declineFriendship, endFriendship
 	};
 };
