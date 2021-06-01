@@ -394,6 +394,19 @@ const getFriendships = async ({user_id}) => {
 // [{query: '', params: []}]
 const executeBatch = async (stmts) => {
 	return db.batch(stmts, { prepare: true });
+const getPendingFriendships = async ({user_id}) => {
+	const query = [`SELECT friendship_id, user_a_id, first_name||' '::text||last_name AS name FROM users, friendships WHERE user_id = user_a_id AND user_b_id = $1 AND accepted = false;`, [user_id]];
+	logger.debug(JSON.stringify(query));
+	return db.query(...query)
+	.then(res => res.rows.map(convertTypesForDistribution))
+	.then(res => {
+		const out = {};
+		for (let row of res)
+			out[row.friendship_id] = {user_id: row.user_a_id, name: row.name};
+		return out;
+	})
+	.then(res => {console.log(res); return res;})
+	;
 };
 
 module.exports = ({db, snowmachine}) => {
