@@ -306,7 +306,7 @@ const getCalendarEventsByUserIds = async ({user_id, friend_ids}) => {
 					await Promise.all(results
 						.filter(cal => cal.user_id === user_id)
 						.map(cal => cal.url)
-						.map(url => fetch(url)
+						.map(url => (console.log('Fetching', url) || fetch(url))
 							.then(res => res.text())
 							.then(res => ics2json(res)
 								.map(({startDate, endDate}) => ({start: startDate, end: endDate}))
