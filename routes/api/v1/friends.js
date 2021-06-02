@@ -33,7 +33,7 @@ const list_current_friends = (req, res) => {
 
 const list_pending_friends = (req, res) => {
 	dal.getPendingFriendships({user_id: req.session.user_id})
-	.then(() => res.end())
+	.then(friendships => res.json(friendships))
 	.catch(handle(req, res));
 };
 
