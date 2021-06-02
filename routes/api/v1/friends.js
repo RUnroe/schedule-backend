@@ -50,7 +50,7 @@ const add_friend = (req, res) => {
 };
 
 const delete_friend = (req, res) => {
-	dal.endFriendship({user_id: req.session.user_id, friendship_id: req.params.friendship_id})
+	dal.endFriendship({user_id: req.session.user_id, friendship_or_user_id: req.params.friendship_id})
 	.then(found => {
 		if (found) {
 			res.status(204);
@@ -64,7 +64,7 @@ const delete_friend = (req, res) => {
 };
 
 const accept_friend = (req, res) => {
-	dal.acceptFriendship({user_id: req.session.user_id, friendship_id: req.params.friendship_id})
+	dal.acceptFriendship({user_id: req.session.user_id, friendship_or_user_id: req.params.friendship_id})
 	.then(found => {
 		if (found) {
 			res.status(204);
