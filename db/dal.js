@@ -323,6 +323,7 @@ const getCalendarEventsByUserIds = async ({user_id, friend_ids}) => {
 		});
 };
 
+// FIXME yeah this is broken now lmao
 const searchFriends = async ({user_id, user_name}) => {
 	const query = [`
 SELECT

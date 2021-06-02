@@ -10,7 +10,7 @@ const configure = (obj) => {
 const { requireAuth, requireNotAuth, handle } = require(require.main.path + '/routes/util');
 
 const getCalendarEvents = (req, res) => {
-	dal.getCalendarEventsByUserIds({user_id: req.session.user_id, friend_ids: req.query.id?.split(',') || []})
+	dal.getCalendarEventsByUserIds({user_id: req.session.user_id, friend_ids: req.query.user_id?.split(',') || []})
 		.then(data => res.json(data))
 		.catch(handle(req, res));
 };
